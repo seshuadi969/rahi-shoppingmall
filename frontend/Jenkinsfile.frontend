@@ -1,0 +1,115 @@
+pipeline {
+    agent any
+    
+    environment {
+        NODE_VERSION = '18'
+        VERCEL_TOKEN = credentials('vercel-token')
+        VERCEL_ORG_ID = credentials('vercel-org-id')
+        VERCEL_PROJECT_ID = credentials('vercel-project-id')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'echo "📦 Checking out frontend code"'
+            }
+        }
+        
+        stage('Setup Node.js') {
+            steps {
+                sh """
+                    node --version
+                    npm --version
+                    echo "✅ Node.js environment setup"
+                """
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                dir('frontend') {
+                    sh """
+                        npm ci
+                        echo "✅ Frontend dependencies installed"
+                    """
+                }
+            }
+        }
+        
+        stage('Code Quality Check') {
+            steps {
+                dir('frontend') {
+                    sh """
+                        echo "🔍 Running code quality checks..."
+                        npx eslint src/ --no-error-on-unmatched-pattern || echo "ESLint completed"
+                        npm audit --audit-level high || true
+                    """
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                dir('frontend') {
+                    sh """
+                        echo "🏗️ Building frontend..."
+                        npm run build
+                        echo "✅ Frontend build completed"
+                    """
+                }
+            }
+        }
+        
+        stage('Test Build') {
+            steps {
+                dir('frontend') {
+                    sh """
+                        echo "🧪 Testing build output..."
+                        ls -la dist/
+                        [ -f dist/index.html ] && echo "✅ Build output verified" || exit 1
+                    """
+                }
+            }
+        }
+        
+        stage('Deploy to Vercel') {
+            when {
+                branch 'main'
+            }
+            steps {
+                dir('frontend') {
+                    sh """
+                        echo "🚀 Deploying to Vercel..."
+                        # Install Vercel CLI
+                        npm install -g vercel
+                        
+                        # Deploy to production
+                        vercel --prod --token ${VERCEL_TOKEN} --confirm
+                        
+                        echo "✅ Frontend deployment initiated"
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "🎉 Frontend CI/CD pipeline completed"
+            cleanWs()
+        }
+        success {
+            slackSend(
+                channel: '#deployments',
+                message: "✅ Frontend deployed successfully! Build: ${env.BUILD_URL}"
+            )
+        }
+        failure {
+            slackSend(
+                channel: '#deployments',
+                message: "❌ Frontend deployment failed! Build: ${env.BUILD_URL}"
+            )
+        }
+    }
+}

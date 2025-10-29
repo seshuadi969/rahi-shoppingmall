@@ -1,0 +1,22 @@
+{
+  "name": "rahi-shopping-backend",
+  "version": "1.0.0",
+  "description": "Backend for Rahi Shopping Mall",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "pg": "^8.7.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
+    "dotenv": "^16.0.3"
+  },
+  "keywords": ["ecommerce", "shopping", "api"],
+  "author": "Rahi Team",
+  "license": "MIT"
+}

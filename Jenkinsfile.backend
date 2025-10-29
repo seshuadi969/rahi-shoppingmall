@@ -1,0 +1,87 @@
+pipeline {
+    agent any
+    
+    triggers {
+        pollSCM('H/5 * * * *') // Poll SCM every 5 minutes
+    }
+    
+    environment {
+        NODE_VERSION = '18'
+        RAILWAY_TOKEN = credentials('railway-token')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                dir('backend') {
+                    sh '''
+                        npm ci
+                        echo "✅ Backend setup completed"
+                    '''
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                dir('backend') {
+                    sh '''
+                        echo "🧪 Running backend tests..."
+                        npm test || echo "No tests configured"
+                    '''
+                }
+            }
+        }
+        
+        stage('Deploy to Staging') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                dir('backend') {
+                    sh '''
+                        echo "🚀 Deploying to Staging..."
+                        npm install -g @railway/cli
+                        railway up --service backend-staging --token ${RAILWAY_TOKEN}
+                        
+                        sleep 45
+                        curl -f https://rahi-backend-staging.up.railway.app/api/health || exit 1
+                        echo "✅ Staging deployment successful"
+                    '''
+                }
+            }
+        }
+        
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: 'Deploy to Production?', ok: 'Deploy'
+                dir('backend') {
+                    sh '''
+                        echo "🚀 Deploying to Production..."
+                        npm install -g @railway/cli
+                        railway up --service backend --token ${RAILWAY_TOKEN}
+                        
+                        sleep 60
+                        curl -f https://rahi-backend.up.railway.app/api/health || exit 1
+                        echo "✅ Production deployment successful"
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

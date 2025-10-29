@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rahi Shopping Mall - Online Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        .content {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        .feature {
+            text-align: center;
+            padding: 30px 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        .feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .feature h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        .feature p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .status-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+            border-left: 5px solid #667eea;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Rahi Shopping Mall</h1>
+            <p>Your Premier Online Shopping Destination</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Welcome to Our Store!</h2>
+            <p style="text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 40px;">
+                Discover amazing products at unbeatable prices. We offer everything from electronics to fashion, all in one place.
+            </p>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📦</div>
+                    <h3>Wide Selection</h3>
+                    <p>Thousands of products across various categories with daily new arrivals</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🚚</div>
+                    <h3>Fast Delivery</h3>
+                    <p>Same-day delivery in metro cities and express shipping nationwide</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Shopping</h3>
+                    <p>Bank-level encryption and secure payment processing for your safety</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Best Quality</h3>
+                    <p>100% authentic products with manufacturer warranty and easy returns</p>
+                </div>
+            </div>
+            
+            <div class="status-panel">
+                <h3 style="margin-bottom: 20px;">System Status</h3>
+                <div style="margin: 20px 0;">
+                    <strong>Backend API:</strong> 
+                    <span id="api-status" class="status-indicator status-offline">Checking...</span>
+                </div>
+                <div style="margin: 20px 0;">
+                    <strong>Database:</strong> 
+                    <span id="db-status" class="status-indicator status-offline">Checking...</span>
+                </div>
+                <button class="btn" onclick="checkSystem()">Refresh Status</button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn" onclick="exploreProducts()">🎁 Start Shopping Now</button>
+                <button class="btn btn-secondary" onclick="viewCart()">🛒 View Cart</button>
+            </div>
+
+            <div style="margin-top: 50px; padding: 30px; background: #f8f9fa; border-radius: 15px; text-align: center;">
+                <h3 style="margin-bottom: 20px;">🚀 Successfully Hosted!</h3>
+                <p style="margin-bottom: 15px;"><strong>Frontend URL:</strong> http://YOUR_SERVER_IP:3000</p>
+                <p style="margin-bottom: 15px;"><strong>Backend API:</strong> http://YOUR_SERVER_IP:5000</p>
+                <p style="margin-bottom: 20px;"><strong>Health Check:</strong> http://YOUR_SERVER_IP:5000/api/health</p>
+                <p style="color: #28a745; font-weight: bold;">✅ Your Rahi Shopping Mall is now LIVE and accessible!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkSystem() {
+            const apiStatus = document.getElementById('api-status');
+            const dbStatus = document.getElementById('db-status');
+            
+            apiStatus.textContent = 'Checking...';
+            apiStatus.className = 'status-indicator status-offline';
+            dbStatus.textContent = 'Checking...';
+            dbStatus.className = 'status-indicator status-offline';
+            
+            try {
+                // Check backend API
+                const response = await fetch('http://localhost:5000/api/health');
+                const data = await response.json();
+                apiStatus.textContent = 'ONLINE ✅';
+                apiStatus.className = 'status-indicator status-online';
+                
+                // Check database
+                const dbResponse = await fetch('http://localhost:5000/api/test-db');
+                const dbData = await dbResponse.json();
+                dbStatus.textContent = 'ONLINE ✅';
+                dbStatus.className = 'status-indicator status-online';
+                
+            } catch (error) {
+                apiStatus.textContent = 'OFFLINE ❌';
+                apiStatus.className = 'status-indicator status-offline';
+                dbStatus.textContent = 'OFFLINE ❌';
+                dbStatus.className = 'status-indicator status-offline';
+            }
+        }
+        
+        function exploreProducts() {
+            alert('🚀 Welcome to Rahi Shopping Mall!\n\n📱 Features Available:\n• Browse thousands of products\n• Secure checkout process\n• Order tracking\n• 24/7 customer support\n\n🎯 Backend System: ' + window.location.hostname + ':5000');
+        }
+        
+        function viewCart() {
+            alert('🛒 Your shopping cart is empty\n\nStart adding products to see them here!');
+        }
+        
+        // Check system status on page load
+        checkSystem();
+        
+        // Update IP address in the display
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('p');
+            elements.forEach(el => {
+                el.innerHTML = el.innerHTML.replace(/YOUR_SERVER_IP/g, window.location.hostname);
+            });
+        });
+    </script>
+</body>
+</html>
